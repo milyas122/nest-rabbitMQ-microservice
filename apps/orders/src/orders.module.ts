@@ -4,9 +4,10 @@ import { OrdersService } from './orders.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { OrdersRepository } from './orders.repository';
-import { DatabaseModule, dbConstants } from '@app/common';
+import { DatabaseModule, RmqModule, dbConstants } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { OrderSchema } from './schema/order.schema';
+import { BILLING_SERVICE } from './constants/service';
 
 @Module({
   imports: [
@@ -15,6 +16,8 @@ import { OrderSchema } from './schema/order.schema';
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
         PORT: Joi.number().required(),
+        RABBIT_MQ_URI: Joi.string().required(),
+        RABBIT_MQ_BILLING_QUEUE: Joi.string().required(),
       }),
       envFilePath: './apps/orders/.env',
     }),
@@ -22,6 +25,9 @@ import { OrderSchema } from './schema/order.schema';
     MongooseModule.forFeature([
       { name: dbConstants.orderTable, schema: OrderSchema },
     ]),
+    RmqModule.register({
+      name: BILLING_SERVICE,
+    }),
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersRepository],
