@@ -12,13 +12,25 @@ export class OrdersRepository {
   constructor(
     @InjectModel(dbConstants.orderTable)
     private readonly orderModel: Model<Order>,
-    @InjectConnection() connection: Connection,
+    @InjectConnection() private readonly connection: Connection,
   ) {}
-  async create(data: CreateOrderDto) {
-    return await this.orderModel.create({ _id: new Types.ObjectId(), ...data });
+
+  async create(data: CreateOrderDto, session?: any) {
+    const options = session ? { session } : {};
+    const document = new this.orderModel({
+      _id: new Types.ObjectId(),
+      ...data,
+    });
+    return await document.save(options);
   }
 
   async getAll() {
     return await this.orderModel.find();
+  }
+
+  async startTransaction() {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    return session;
   }
 }
