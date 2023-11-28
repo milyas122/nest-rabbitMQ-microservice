@@ -41,6 +41,7 @@ export class UserService {
     }
     return user;
   }
+
   async getUser(userDto: GetUserDto) {
     return await this.usersRepository.getById(userDto._id);
   }

@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class RmqService {
   constructor(private readonly configService: ConfigService) {}
-  async getOptions(queue: string, noAck = false): Promise<RmqOptions> {
+  getOptions(queue: string, noAck = false): RmqOptions {
     return {
       transport: Transport.RMQ,
       options: {
@@ -17,7 +17,7 @@ export class RmqService {
     };
   }
 
-  async ack(context: RmqContext) {
+  ack(context: RmqContext) {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
     channel.ack(originalMessage);

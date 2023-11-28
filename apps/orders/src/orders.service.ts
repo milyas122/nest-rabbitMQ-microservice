@@ -12,13 +12,15 @@ export class OrdersService {
     @Inject(BILLING_SERVICE) private billingClient: ClientProxy,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto) {
+  async createOrder(createOrderDto: CreateOrderDto, authentication: string) {
     const order = await this.orderRepository.create(createOrderDto);
-    console.log('Create Order calling...');
 
     // convert an observable to a promise
     await lastValueFrom(
-      this.billingClient.emit('order_created', { createOrderDto }),
+      this.billingClient.emit('order_created', {
+        createOrderDto,
+        Authentication: authentication,
+      }),
     );
 
     return order;
